@@ -15,6 +15,9 @@ This version has the following issues:
     Cannot play around a tile (ie, the second letter was already on the board)
     
 """
+
+
+#Testing for comment changes
  
 import time
 import copy
