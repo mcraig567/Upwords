@@ -420,9 +420,28 @@ def test_get_words_hor():
     assert len(heights) == 2
     assert heights[0] == 3
     assert heights[1] == 3      
-    
-    
+      
     #Test adding on to start of a blank word
+    tiles = build_tiles(8,8)    
+    tiles[17].update_letter('t')
+    tiles[17].update_height()
+    tiles[18].update_letter('h')
+    tiles[18].update_height()
+    tiles[19].update_letter('e')
+    tiles[19].update_height()
+    tiles[20].update_letter('r')
+    tiles[20].update_height()
+    tiles[21].update_letter('e')
+    tiles[21].update_height()
+    
+    words, heights, touch = get_words('t', (2,1), 1, tiles, 0)
+    assert len(words) == 1
+    assert words[0] == 'there'
+    assert len(heights) == 1
+    assert heights[0] == 5    
+    
+    
+    
     
     #Test adding on to start of a word with cross words
     
