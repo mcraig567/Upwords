@@ -9,6 +9,7 @@ Created on Thu Apr 16 15:37:36 2020
 To Do:
     Implement no playing a tile on top of the same letter
     Implement no playing 's' only to pluralize a word
+    Touch check error - playing cat at (0,2) and not registering toy at (0,4)
     
 
 This version has the following issues:
@@ -276,7 +277,7 @@ def get_words(word, location, orientation, tiles, turn):
                             #Find tile that we're actually reviewing this iteration and create word from start
                             for play_tile in tiles:
                                 if play_tile.get_location() == (startTile.location[0], startTile.location[1] + i):                           
-                                    new_word, new_height = make_word("", location, orientation * -1, tiles, play_tile, 0)
+                                    new_word, new_height = make_word("", play_tile.get_location(), orientation * -1, tiles, play_tile, 0)
                                     acc_words.append(new_word)
                                     acc_heights.append(new_height)
                          
@@ -286,7 +287,7 @@ def get_words(word, location, orientation, tiles, turn):
                 
                 #Find start of word for letter we're reviewing, then create word
                 nextStart = find_start(word, (location[0], location[1] + i), orientation * -1, tiles)
-                new_word, new_height = make_word("", nextStart.location, orientation * -1, tiles, nextStart, 0)
+                new_word, new_height = make_word("", nextStart.get_location(), orientation * -1, tiles, nextStart, 0)
                 acc_words.append(new_word)
                 acc_heights.append(new_height)
     
@@ -305,7 +306,7 @@ def get_words(word, location, orientation, tiles, turn):
         #Find the start and build word from there
         else:
             startTile = find_start(word, location, orientation, tiles)
-            new_word, new_height = make_word("", startTile.location, orientation, tiles, startTile, 0)
+            new_word, new_height = make_word("", startTile.get_location(), orientation, tiles, startTile, 0)
             main_word.append(new_word)
             main_height.append(new_height)
             
@@ -322,7 +323,7 @@ def get_words(word, location, orientation, tiles, turn):
                             #Find tile that we're actually reviewing this iteration and create word from start
                             for play_tile in tiles:
                                 if play_tile.get_location() == (startTile.location[0] + i, startTile.location[1]):
-                                    new_word, new_height = make_word("", location, orientation * -1, tiles, play_tile, 0)
+                                    new_word, new_height = make_word("", play_tile.get_location(), orientation * -1, tiles, play_tile, 0)
                                     acc_words.append(new_word)
                                     acc_heights.append(new_height)
                                     
@@ -332,7 +333,7 @@ def get_words(word, location, orientation, tiles, turn):
                 
                 #Find start of word for letter we're reviewing then create word
                 nextStart = find_start(word, (location[0] + i, location[1]), orientation * -1, tiles)
-                new_word, new_height = make_word("", nextStart.location, orientation * -1, tiles, nextStart, 0)
+                new_word, new_height = make_word("", nextStart.get_location(), orientation * -1, tiles, nextStart, 0)
                 acc_words.append(new_word)
                 acc_heights.append(new_height)
     
