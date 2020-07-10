@@ -9,7 +9,6 @@ Created on Thu Apr 16 15:37:36 2020
 To Do:
     Implement no playing a tile on top of the same letter
     Implement no playing 's' only to pluralize a word
-    Touch check error - playing cat at (0,2) and not registering toy at (0,4)
     
 
 This version has the following issues:
@@ -396,8 +395,14 @@ def update_score_end(players):
     """Remove 5 points for every letter in a player's hand at end of game"""
     
     for name in players:
-        for letter in name.get_hand():
-            name.update_score(-5)
+        
+        hand_len = len(name.get_hand())
+        
+        #If (qu) in hand, remove three of the characters
+        if 'q' in name.get_hand():
+            hand_len -= 3
+            
+        name.update_score(-5*hand_len)
     
     return None
     
@@ -405,10 +410,7 @@ def update_score_end(players):
  
 def update_board(word, tiles, orientation, location):
     """Update the board with the played tiles"""
-    
-    
-    """Need to figure out how to apply QU to this"""
-    
+        
     word_copy = word
     
     #If QU was played, remove the 'u' from the word
@@ -600,7 +602,7 @@ def play_word(wordList, letters, tiles, player, word, turn):
     tiles = copy.deepcopy(turn_tiles)
     return tiles
 
-def exchange_tile(player, letters):
+def exchange_tile(player, letters, testing=False, testLetter=None):
     """
     The player can trade in one letter for another from the bag as their turn
     Ensures that only one letter is exchanged, and that the player has that letter in their hand
@@ -608,8 +610,12 @@ def exchange_tile(player, letters):
     Adds the chosen letter back into the letter pool
     """
     
-    print("Here is your hand:", player.get_hand())
-    letter = input("What letter would you like to exchange? ")
+    if not testing:
+        print("Here is your hand:", player.get_hand())
+        letter = input("What letter would you like to exchange? ")
+        
+    else:
+        letter = testLetter
     
     exchange_go = False
     while exchange_go == False:
@@ -784,28 +790,5 @@ def play_game(wordList, letters, tiles):
 
     update_score_end(players)
     print_final_scores(players)        
-
-"""
-Testing
-"""
-
-#play_game(create_words(), create_letterpool(), build_tiles(WIDTH, LENGTH))
-
-#print_grid(tiles)
-
-# #Test One
-# print("Test One")
-# orientation = 1
-# word = "three"
-# hand = "threeoi"
-# location = (0,0)
-
-# initial_checks(word, hand, location, orientation, tiles)
-# check_word(word, wordList)
-# print()
-
-# #Test Two
-# print("Test Two")
-# location = (6,0)
-# check_location(word, location, orientation)
-# print()
+    
+    

@@ -8,7 +8,8 @@ Created on Sun Jul  5 13:30:10 2020
 
 from classes import player, tile
 from main import create_words, create_letterpool, build_tiles, make_word
-from main import find_start, get_words
+from main import find_start, get_words, score_word, update_score_end
+from main import update_board, exchange_tile
 
 #Slowest test by a lot - uncomment if you want to run
 def test_create_words():
@@ -922,3 +923,196 @@ def test_get_words_diagonal_vert():
     assert words[0] == 'there'
     assert len(heights) == 1
     assert heights[0] == 5    
+
+def test_score_word():
+    
+    score = score_word("hello", 5)
+    assert score == 10
+    
+    score = score_word("hello", 6)
+    assert score == 6
+    
+    score = score_word("queen", 4)
+    assert score == 10
+    
+    score = score_word("queen", 6)
+    assert score == 6
+    
+def test_update_score_end():
+    p1 = player("p1", "", 50, 1)
+    p2 = player("p2", "abc", 50, 2)
+    p3 = player("p3", "(qu)werty", 75, 3)    
+    players = [p1, p2, p3]
+    
+    update_score_end(players)
+    
+    assert p1.get_score() == 50
+    assert p2.get_score() == 35
+    assert p3.get_score() == 45
+    
+def test_update_board_middle_hor():
+    tiles = build_tiles(8,8)
+    
+    #Horizontal word in middle of board
+    update_board("the", tiles, 1, (1,3))
+    assert tiles[10].get_letter() == 0
+    assert tiles[11].get_letter() == 't'
+    assert tiles[13].get_letter() == 'e'
+    assert tiles[14].get_letter() == 0
+    
+    assert tiles[10].get_height() == 0
+    assert tiles[11].get_height() == 1
+    assert tiles[13].get_height() == 1
+    assert tiles[14].get_height() == 0
+    
+    #Horizontal word overwriting existing tiles
+    update_board("s", tiles, 1, (1,3))
+    assert tiles[10].get_letter() == 0
+    assert tiles[10].get_height() == 0
+    assert tiles[11].get_letter() == 's'
+    assert tiles[11].get_height() == 2
+    assert tiles[12].get_letter() == 'h'
+    assert tiles[12].get_height() == 1
+    
+def test_update_board_edges_hor():
+    tiles = build_tiles(8,8)
+    
+    #Horizontal word on top edge
+    update_board("the", tiles, 1, (0,2))
+    assert tiles[1].get_letter() == 0
+    assert tiles[2].get_letter() == 't'
+    assert tiles[4].get_letter() == 'e'
+    assert tiles[5].get_letter() == 0
+    
+    assert tiles[1].get_height() == 0
+    assert tiles[2].get_height() == 1
+    assert tiles[4].get_height() == 1
+    assert tiles[5].get_height() == 0
+    
+    #Horizontal word on bottom edge
+    update_board("the", tiles, 1, (7,2))
+    assert tiles[57].get_letter() == 0
+    assert tiles[58].get_letter() == 't'
+    assert tiles[60].get_letter() == 'e'
+    assert tiles[61].get_letter() == 0
+    
+    assert tiles[57].get_height() == 0
+    assert tiles[58].get_height() == 1
+    assert tiles[60].get_height() == 1
+    assert tiles[61].get_height() == 0 
+    
+    #Horizontal word ending on right edge
+    update_board("the", tiles, 1, (3,5))
+    assert tiles[28].get_letter() == 0
+    assert tiles[29].get_letter() == 't'
+    assert tiles[31].get_letter() == 'e'
+    
+    assert tiles[28].get_height() == 0
+    assert tiles[29].get_height() == 1
+    assert tiles[31].get_height() == 1
+      
+    #Horizontal word starting on left edge
+    update_board("the", tiles, 1, (2,0))
+    assert tiles[16].get_letter() == 't'
+    assert tiles[18].get_letter() == 'e'
+    assert tiles[19].get_letter() == 0
+    
+    assert tiles[16].get_height() == 1
+    assert tiles[18].get_height() == 1
+    assert tiles[19].get_height() == 0 
+    
+def test_update_board_middle_vert():
+    tiles = build_tiles(8,8)
+    
+    #Vertical word in middle of board
+    update_board("the", tiles, -1, (1,3))
+    assert tiles[3].get_letter() == 0
+    assert tiles[11].get_letter() == 't'
+    assert tiles[27].get_letter() == 'e'
+    assert tiles[35].get_letter() == 0
+    
+    assert tiles[3].get_height() == 0
+    assert tiles[11].get_height() == 1
+    assert tiles[27].get_height() == 1
+    assert tiles[35].get_height() == 0
+    
+    #Vertical word overwriting existing tiles
+    update_board("s", tiles, -1, (1,3))
+    assert tiles[3].get_letter() == 0
+    assert tiles[3].get_height() == 0
+    assert tiles[11].get_letter() == 's'
+    assert tiles[11].get_height() == 2
+    assert tiles[19].get_letter() == 'h'
+    assert tiles[19].get_height() == 1
+    
+def test_update_board_edges_vert():
+    tiles = build_tiles(8,8)
+    
+    #Vertical word on left edge
+    update_board("the", tiles, -1, (3,0))
+    assert tiles[16].get_letter() == 0
+    assert tiles[24].get_letter() == 't'
+    assert tiles[40].get_letter() == 'e'
+    assert tiles[48].get_letter() == 0
+    
+    assert tiles[16].get_height() == 0
+    assert tiles[24].get_height() == 1
+    assert tiles[40].get_height() == 1
+    assert tiles[48].get_height() == 0
+    
+    #Vertical word on right edge
+    update_board("the", tiles, -1, (2,7))
+    assert tiles[15].get_letter() == 0
+    assert tiles[23].get_letter() == 't'
+    assert tiles[39].get_letter() == 'e'
+    assert tiles[47].get_letter() == 0
+    
+    assert tiles[15].get_height() == 0
+    assert tiles[23].get_height() == 1
+    assert tiles[39].get_height() == 1
+    assert tiles[47].get_height() == 0 
+    
+    #Vertical word ending on bottom edge
+    update_board("the", tiles, -1, (5,4))
+    assert tiles[36].get_letter() == 0
+    assert tiles[44].get_letter() == 't'
+    assert tiles[60].get_letter() == 'e'
+    
+    assert tiles[36].get_height() == 0
+    assert tiles[44].get_height() == 1
+    assert tiles[60].get_height() == 1
+      
+    #Vertical word starting on top edge
+    update_board("the", tiles, -1, (0,5))
+    assert tiles[5].get_letter() == 't'
+    assert tiles[21].get_letter() == 'e'
+    assert tiles[29].get_letter() == 0
+    
+    assert tiles[5].get_height() == 1
+    assert tiles[21].get_height() == 1
+    assert tiles[29].get_height() == 0     
+    
+def test_exchange_tile():
+    p1 = player("p1", "abcdefg", 0, 1)
+    p2 = player("p2", "abc(qu)fg", 0, 1)
+    letters = ["w"]    
+    
+    exchange_tile(p1, letters, True, "a")
+    assert len(letters) == 1
+    assert letters[0] == "a"
+    assert len(p1.get_hand()) == 7
+    assert p1.get_hand() == "bcdefgw"
+    
+    exchange_tile(p2, letters, True, "(qu)")
+    assert len(letters) == 1
+    assert letters[0] == "(qu)"
+    assert len(p2.get_hand()) == 6
+    assert p2.get_hand() == "abcfga"    
+    
+    
+    
+    
+    
+    
+    
+    
