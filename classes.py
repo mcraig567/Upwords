@@ -86,20 +86,34 @@ class player(object):
     def update_hand(self, hand, letters):
         hand_length = len(self.get_hand())
         
-        #max hand length is 7 letters
-        for i in range(HANDSIZE - hand_length):
-           
-            #No more updating once the bag of letters is empty
-            if len(letters) > 0:
+        #Max hand length is 7 letters, but qu tile is read as 4
+        if 'q' in self.hand:
+            for i in range(HANDSIZE + 3 - hand_length):
+                
+                #No more updating once the bag of letters is empty
+                if len(letters) > 0:
             
-                #Use random number to determine location in letter list
-                rand = random.random()
-                letter = letters[math.floor(rand*len(letters))]
-                letters.remove(letter)
-                hand = hand + letter 
-                self.hand = hand
+                    #Use random number to determine location in letter list
+                    rand = random.random()
+                    letter = letters[math.floor(rand*len(letters))]
+                    letters.remove(letter)
+                    hand = hand + letter 
+                    self.hand = hand
         
-    
+        #No qu tile in hand
+        else:
+            for i in range(HANDSIZE - hand_length):
+               
+                #No more updating once the bag of letters is empty
+                if len(letters) > 0:
+                
+                    #Use random number to determine location in letter list
+                    rand = random.random()
+                    letter = letters[math.floor(rand*len(letters))]
+                    letters.remove(letter)
+                    hand = hand + letter 
+                    self.hand = hand
+           
     def remove_letter(self, hand, letter):
         hand = hand.replace(letter, '', 1)
         self.hand = hand
