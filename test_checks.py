@@ -7,7 +7,7 @@ Created on Sun Jul 12 11:37:41 2020
 
 from classes import tile, player
 from checks import check_hand, check_location, check_heights
-from checks import touch_check, check_word
+from checks import touch_check, check_word, check_repeats, check_plural
 from main import build_tiles
 
 
@@ -213,7 +213,79 @@ def test_check_word():
     test = check_word("THEM", wordList)
     assert test == True
     
+def test_check_repeats_hor():
+    tiles = build_tiles(8,8)
+    tiles[27].update_letter('t')
+    tiles[27].update_height()
+    tiles[28].update_letter('h')
+    tiles[28].update_height()
+    tiles[29].update_letter('e')
+    tiles[29].update_height()
     
+    #Test no repeats
+    test = check_repeats("rial", (3,4), 1, tiles)
+    assert test == True
+    
+    #Test repeat
+    test = check_repeats("he", (3,4), 1, tiles)
+    assert test == False
+    
+def test_check_repeats_vert():
+    tiles = build_tiles(8,8)
+    tiles[27].update_letter('t')
+    tiles[27].update_height()
+    tiles[35].update_letter('h')
+    tiles[35].update_height()
+    tiles[43].update_letter('e')
+    tiles[43].update_height()
+    
+    #Test no repeats
+    test = check_repeats("rial", (4,3), -1, tiles)
+    assert test == True
+    
+    #Test repeat
+    test = check_repeats("he", (4,3), -1, tiles)
+    assert test == False
+    
+def test_check_plural_hor():
+    #check_plural(location, words, orientation, main_start_tile, acc_start_tile)
+    tiles = build_tiles(8,8)
+        
+    #Test only main word, pluralized
+    test = check_plural((3,3), ["pens"], 1, tiles[24], tiles[27])
+    assert test == False
+    
+    #Test only main word, not pluralized
+    test = check_plural((3,0), ["spending"], 1, tiles[24], tiles[24])
+    assert test == True
+    
+    #Test with acc word, pluralizing both
+    test = check_plural((3,3), ["pens", "runs"], 1, tiles[24], tiles[3])
+    assert test == False    
+    
+    #Test with acc word, not pluralizing acc word
+    test = check_plural((3,3), ["pens", "trust"], 1, tiles[24], tiles[3])
+    assert test == True
+    
+def test_check_plural_vert():
+    #check_plural(location, words, orientation, main_start_tile, acc_start_tile)
+    tiles = build_tiles(8,8)
+        
+    #Test only main word, pluralized
+    test = check_plural((3,3), ["pens"], -1, tiles[3], tiles[27])
+    assert test == False
+    
+    #Test only main word, not pluralized
+    test = check_plural((0,3), ["spending"], -1, tiles[3], tiles[3])
+    assert test == True
+    
+    #Test with acc word, pluralizing both
+    test = check_plural((3,3), ["pens", "runs"], -1, tiles[3], tiles[24])
+    assert test == False    
+    
+    #Test with acc word, not pluralizing acc word
+    test = check_plural((3,3), ["pens", "trust"], -1, tiles[3], tiles[24])
+    assert test == True    
     
     
     

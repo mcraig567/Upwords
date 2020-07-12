@@ -10,6 +10,7 @@ Check if word can be played
 - Are all letters to be played in the player's hand
 - Does the word go off the edge of the board
 - Are all tiles being played on still valid tiles
+- Do any of the letters get played on the same letter
 - Are all new words real words
 
 All checks to return True if okay, False if not okay
@@ -88,7 +89,69 @@ def check_heights(word, location, orientation, tiles):
                         return False
         print("Height Check --- Pass")
         return True
+    
+def check_plural(location, words, orientation, main_start_tile, acc_start_tile):
+    """Ensure that the letter played is not solely to pluralize a word"""
 
+    #Player only played a single tile, at most one accessory word
+    if len(words) == 1:
+        main_word = words[0]
+              
+        #Horizontal Word
+        if orientation == 1:
+            #Player pluralized the word
+            if location[1] == main_start_tile.get_location()[1] + len(main_word) - 1:
+                return False
+            
+            #s not played at end of word
+            else:
+                return True
+        
+        #Vertical Word
+        else:
+            #Player pluralized the word
+            if location[0] == main_start_tile.get_location()[0] + len(main_word) - 1:
+                return False
+            
+            #s not played at end of word
+            else:
+                return True
+            
+    #There is an accessory word    
+    else:
+        main_word = words[0]
+        acc_word = words[1]
+        
+        #Horizontal Word
+        if orientation == 1:
+            #Player pluralized the main word
+            if location[1] == main_start_tile.get_location()[1] + len(main_word) - 1:
+                #Player also pluralized the accessory word
+                if location[0] == acc_start_tile.get_location()[0] + len(acc_word) - 1:
+                    return False
+                #Player made a real move on the accessory word
+                else:
+                    return True
+            
+            #The s was not played at the end of the word    
+            else:
+                return True
+        
+        #Vertical word
+        else:
+            #Player pluralized the main word
+            if location[0] == main_start_tile.get_location()[0] + len(main_word) - 1:
+                #Player also pluralized the accessory word
+                if location[1] == acc_start_tile.get_location()[1] + len(acc_word) - 1:
+                    return False
+                #Player made a real move on the accessory word
+                else:
+                    return True
+            
+            #The s was not played at the end of the main word
+            else:
+                return True
+                
 #Function to run all initial checks in one call
 def initial_checks(word, hand, location, orientation, tiles):
     """
@@ -103,6 +166,27 @@ def initial_checks(word, hand, location, orientation, tiles):
         return True
     else:
         return False
+    
+def check_repeats(word, location, orientation, tiles):
+    """Checks to see if player is placing a letter on the same letter (ex. playing 'a' on 'a')"""
+    
+    #Horizontal Words
+    if orientation == 1:
+        for i in range(len(word)):
+            for test_tile in tiles:
+                if test_tile.get_location() == (location[0], location[1] + i):
+                    if test_tile.get_letter() == word[i]:
+                        return False
+                    
+    #Vertical Words
+    else:
+        for i in range(len(word)):
+            for test_tile in tiles:
+                if test_tile.get_location() == (location[0] + i, location[1]):
+                    if test_tile.get_letter() == word[i]:
+                        return False        
+
+    return True    
     
 def touch_check(word, main_word, acc_words):
     """

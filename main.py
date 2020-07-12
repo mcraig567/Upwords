@@ -7,7 +7,6 @@ Created on Thu Apr 16 15:37:36 2020
 
 """
 To Do:
-    Implement no playing a tile on top of the same letter
     Implement no playing 's' only to pluralize a word
     
 
@@ -26,7 +25,7 @@ from colorama import Back
 from colorama import Style
 
 from classes import tile, player
-from checks import initial_checks, touch_check, check_word
+from checks import initial_checks, touch_check, check_word, check_repeats, check_plural
 
 from config import MAXHEIGHT, WIDTH, LENGTH, HANDSIZE
 
@@ -517,10 +516,10 @@ def play_word(wordList, letters, tiles, player, word, turn):
     
     """
     
-    turn_tiles = copy.deepcopy(tiles)
     turn_checks = False
     
-    while turn_checks == False:        
+    while turn_checks == False:     
+        turn_tiles = copy.deepcopy(tiles)
         location = (input("What location would you like to play at? "))
         location = (int(location[0]), int(location[1]))
         orientation = input("Would you like this to be vertical or horizontal (v/h)? ")
@@ -528,7 +527,9 @@ def play_word(wordList, letters, tiles, player, word, turn):
             orientation = 1       
         else:
             orientation = -1
-         
+        
+        #Check to ensure no played letters are the same as existing tile
+        repeat = check_repeats(word, location, orientation, tiles)
         
         #Check word played 
         update_board(word, turn_tiles, orientation, location)
@@ -546,18 +547,38 @@ def play_word(wordList, letters, tiles, player, word, turn):
                
         #Check words affected    
         print()
+
+        #Check to see if player only pluralized a word
+        if word == 's':
+            main_start_tile = find_start('s', location, orientation, tiles)
+            acc_start_tile = find_start('s', location, orientation * -1, tiles)
+            plural = check_plural(location, words, orientation, main_start_tile, acc_start_tile)
+        else:
+            plural = True
+        
         print("Checking to see if all words are valid...")
         for j in range(len(words)):
             real_words = check_word(words[j], wordList)
-            initial = initial_checks(word, player.get_hand(), location, orientation, turn_tiles)
-            if touch:
-                print("Touch Check --- Pass")
-            else:
-                print("ERROR --- Not Touching!")
-            print()
+            
+        initial = initial_checks(word, player.get_hand(), location, orientation, turn_tiles)
+        
+        #Print out previous checks
+        if touch:
+            print("Touch Check --- Pass")
+        else:
+            print("ERROR --- Not Touching!")
+        if repeat:
+            print("Repeat Check --- Pass")
+        else:
+            print("ERROR --- Playing a letter on the same letter")
+        if plural:
+            print("Plural Check --- Pass")
+        else:
+            print("ERROR --- Cannot only pluralize a word")
+        print()
                     
         #Ensure that the turn is allowed
-        if not initial or not real_words or not touch:
+        if not initial or not real_words or not touch or not repeat or not plural:
             print("This is not a legal move! Try again")
             print()
             print("Here is the board")
@@ -791,4 +812,4 @@ def play_game(wordList, letters, tiles):
     update_score_end(players)
     print_final_scores(players)        
     
-    
+#play_game(create_words(), create_letterpool(), build_tiles(LENGTH, WIDTH))
