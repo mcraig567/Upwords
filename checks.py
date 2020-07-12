@@ -56,6 +56,9 @@ def check_location(word, location, orientation):
     else:
         if location[0] + location_word_len > LENGTH:
             print("ERROR --- Word goes off board (Too far down)")
+            print("Word:", word)
+            print("Start Location:", location)
+            print("Last letter at: ", location[0] + location_word_len)
             return False
         else:
             print("Location Check --- Pass")
